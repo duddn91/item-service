@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -18,6 +21,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicItemController {
     private final ItemRepository itemRepository;
+
+    @ModelAttribute("regions")
+    public Map<String, String> regions() {
+        Map<String, String> regions = new LinkedHashMap<>();
+        regions.put("SEOUL", "서울");
+        regions.put("BUSAN", "부산");
+        regions.put("JEJU", "제주");
+        return regions;
+    }
 
     /**
      * 테스트용 데이터 추가
@@ -35,7 +47,7 @@ public class BasicItemController {
         return "basic/items";
     }
 
-    @GetMapping("{itemId}")
+    @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
@@ -43,7 +55,7 @@ public class BasicItemController {
         return "basic/item";
     }
 
-    @GetMapping("add")
+    @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("item", new Item());
         return "basic/addForm";
