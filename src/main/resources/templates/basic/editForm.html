@@ -39,16 +39,16 @@
         <hr class="my-4">
 
         <!-- single checkbox -->
-        <div>판매 여부</div>
+        <div th:text="#{label.item.saleState}">판매 여부</div>
         <div>
             <div class="form-check">
                 <input type="checkbox" id="open" th:field="*{open}" class="form-check-input">
-                <label for="open" class="form-check-label">판매 오픈</label>
+                <label for="open" class="form-check-label" th:text="#{label.item.saleState.open}">판매 오픈</label>
             </div>
         </div>
 
         <div>
-            <div>등록 지역</div>
+            <div th:text="#{label.item.region}">등록 지역</div>
             <div th:each="region : ${regions}" class="form-check form-check-inline">
                 <input type="checkbox" th:field="*{regions}" th:value="${region.key}" class="form-check-input">
                 <label th:for="${#ids.prev('regions')}"
@@ -60,7 +60,7 @@
         </div>
 
         <div>
-            <div>상품 종류</div>
+            <div th:text="#{label.item.productType}">상품 종류</div>
             <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
                 <input type="radio" th:field="*{itemType}" th:value="${type.name()}" class="form-check-input">
                 <label th:for="${#ids.prev('itemType')}" th:text="${type.description}" class="form-check-label">
@@ -70,9 +70,9 @@
         </div>
 
         <div>
-            <div>배송 방식</div>
+            <div th:text="#{label.item.deliveryType}">배송 방식</div>
             <select th:field="*{deliveryCode}" class="form-select">
-                <option value="">==배송 방식 선택==</option>
+                <option value="" th:text="#{select.deliveryType.default}">==배송 방식 선택==</option>
                 <option th:each="deliveryCode : ${deliveryCodes}"
                         th:value="${deliveryCode.code}"
                         th:text="${deliveryCode.displayName}">FAST</option>
