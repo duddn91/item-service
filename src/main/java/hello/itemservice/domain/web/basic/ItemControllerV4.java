@@ -1,16 +1,14 @@
 package hello.itemservice.domain.web.basic;
 
 import hello.itemservice.domain.item.*;
+import hello.itemservice.domain.web.basic.form.ItemSaveForm;
+import hello.itemservice.domain.web.basic.form.ItemUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -22,13 +20,13 @@ import java.util.Map;
 
 
 /**
- * Bean Validation 사용
+ * Form 전송 객체 분리
  */
 @Slf4j
 @Controller
-@RequestMapping("/basic/v3/items")
+@RequestMapping("/basic/v4/items")
 @RequiredArgsConstructor
-public class ItemControllerV3 {
+public class ItemControllerV4 {
     private final ItemRepository itemRepository;
 
     /**
@@ -68,7 +66,7 @@ public class ItemControllerV3 {
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
-        return "basic/v3/items";
+        return "basic/v4/items";
     }
 
     @GetMapping("/{itemId}")
@@ -76,44 +74,21 @@ public class ItemControllerV3 {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
 
-        return "basic/v3/item";
+        return "basic/v4/item";
     }
 
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("item", new Item());
-        return "basic/v3/addForm";
-    }
-
-//    @PostMapping("/add")
-    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
-
-        //특정 필드가 아닌 복합 검증 룰
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
-            }
-        }
-
-        //검증의 실패하면 다시 입력 폼으로
-        if (bindingResult.hasErrors()) {
-            log.info("bindingResult = {}", bindingResult);
-            return "basic/v3/addForm";
-        }
-
-        Item savedItem = itemRepository.save(item);
-        redirectAttributes.addAttribute("itemId", savedItem.getId());
-        redirectAttributes.addAttribute("status", true);
-        return "redirect:/basic/v3/items/{itemId}";
+        return "basic/v4/addForm";
     }
 
     @PostMapping("/add")
-    public String addItemV2(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String addItem(@Validated @ModelAttribute("item") ItemSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         //특정 필드가 아닌 복합 검증 룰
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if (form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -122,49 +97,28 @@ public class ItemControllerV3 {
         //검증의 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
             log.info("bindingResult = {}", bindingResult);
-            return "basic/v3/addForm";
+            return "basic/v4/addForm";
         }
 
-        Item savedItem = itemRepository.save(item);
+        Item savedItem = itemRepository.save(new Item(form));
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/basic/v3/items/{itemId}";
+        return "redirect:/basic/v4/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "basic/v3/editForm";
-    }
-
-//    @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult) {
-
-        //특정 필드가 아닌 복합 검증 룰
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
-            }
-        }
-
-        //검증의 실패하면 다시 입력 폼으로
-        if (bindingResult.hasErrors()) {
-            log.info("bindingResult = {}", bindingResult);
-            return "basic/v3/editForm";
-        }
-
-        itemRepository.update(itemId, item);
-        return "redirect:/basic/v3/items/{itemId}";
+        return "basic/v4/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
-    public String editV2(@PathVariable Long itemId, @Validated(UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult) {
+    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute("item") ItemUpdateForm form, BindingResult bindingResult) {
 
         //특정 필드가 아닌 복합 검증 룰
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if (form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -173,10 +127,10 @@ public class ItemControllerV3 {
         //검증의 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
             log.info("bindingResult = {}", bindingResult);
-            return "basic/v3/editForm";
+            return "basic/v4/editForm";
         }
 
-        itemRepository.update(itemId, item);
-        return "redirect:/basic/v3/items/{itemId}";
+        itemRepository.update(itemId, new Item(form));
+        return "redirect:/basic/v4/items/{itemId}";
     }
 }
