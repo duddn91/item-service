@@ -1,4 +1,4 @@
-package hello.itemservice.domain.web.basic;
+package hello.itemservice.web.item;
 
 import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
@@ -17,7 +17,7 @@ import java.util.*;
 
 @Slf4j
 @Controller
-@RequestMapping("/basic/v1/items")
+@RequestMapping("/v1/items")
 @RequiredArgsConstructor
 public class ItemControllerV1 {
     private final ItemRepository itemRepository;
@@ -46,20 +46,11 @@ public class ItemControllerV1 {
         return deliveryCodes;
     }
 
-    /**
-     * 테스트용 데이터 추가
-     */
-    @PostConstruct
-    public void init() {
-        itemRepository.save(new Item("itemA", 10000, 10));
-        itemRepository.save(new Item("itemB", 20000, 20));
-    }
-
     @GetMapping
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
-        return "basic/v1/items";
+        return "/v1/items";
     }
 
     @GetMapping("/{itemId}")
@@ -67,13 +58,13 @@ public class ItemControllerV1 {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
 
-        return "basic/v1/item";
+        return "/v1/item";
     }
 
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("item", new Item());
-        return "basic/v1/addForm";
+        return "/v1/addForm";
     }
 
     //    @PostMapping("/add")
@@ -91,7 +82,7 @@ public class ItemControllerV1 {
 
         model.addAttribute("item", item);
 
-        return "basic/v1/item";
+        return "/v1/item";
     }
 
     //    @PostMapping("/add")
@@ -100,25 +91,25 @@ public class ItemControllerV1 {
         itemRepository.save(item);
 //      model.addAttribute("item", item); //자동 추가, 생략 가능
 
-        return "basic/v1/item";
+        return "/v1/item";
     }
 
     //    @PostMapping("/add")
     public String addItemV3(@ModelAttribute Item item) {
         itemRepository.save(item);
-        return "basic/v1/item";
+        return "/v1/item";
     }
 
 //    @PostMapping("/add")
     public String addItemV4(Item item) {
         itemRepository.save(item);
-        return "basic/v1/item";
+        return "/v1/item";
     }
 
 //    @PostMapping("/add")
     public String addItemV5(Item item) {
         itemRepository.save(item);
-        return "redirect:/basic/v1/items" + item.getId();
+        return "redirect:/v1/items" + item.getId();
     }
 
     @PostMapping("/add")
@@ -152,25 +143,25 @@ public class ItemControllerV1 {
         if (!errors.isEmpty()) {
             log.info("errors = {}", errors);
             model.addAttribute("errors", errors);
-            return "basic/v1/addForm";
+            return "/v1/addForm";
         }
 
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/basic/v1/items/{itemId}";
+        return "redirect:/v1/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "basic/v1/editForm";
+        return "/v1/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
         itemRepository.update(itemId, item);
-        return "redirect:/basic/v1/items/{itemId}";
+        return "redirect:/v1/items/{itemId}";
     }
 }

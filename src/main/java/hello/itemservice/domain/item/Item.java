@@ -1,15 +1,11 @@
 package hello.itemservice.domain.item;
 
-import hello.itemservice.domain.web.basic.form.ItemSaveForm;
-import hello.itemservice.domain.web.basic.form.ItemUpdateForm;
+import hello.itemservice.web.item.form.ItemSaveForm;
+import hello.itemservice.web.item.form.ItemUpdateForm;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter

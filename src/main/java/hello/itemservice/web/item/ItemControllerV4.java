@@ -1,8 +1,8 @@
-package hello.itemservice.domain.web.basic;
+package hello.itemservice.web.item;
 
 import hello.itemservice.domain.item.*;
-import hello.itemservice.domain.web.basic.form.ItemSaveForm;
-import hello.itemservice.domain.web.basic.form.ItemUpdateForm;
+import hello.itemservice.web.item.form.ItemSaveForm;
+import hello.itemservice.web.item.form.ItemUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,19 +24,10 @@ import java.util.Map;
  */
 @Slf4j
 @Controller
-@RequestMapping("/basic/v4/items")
+@RequestMapping("/v4/items")
 @RequiredArgsConstructor
 public class ItemControllerV4 {
     private final ItemRepository itemRepository;
-
-    /**
-     * 테스트용 데이터 추가
-     */
-    @PostConstruct
-    public void init() {
-        itemRepository.save(new Item("itemA", 10000, 10));
-        itemRepository.save(new Item("itemB", 20000, 20));
-    }
 
     @ModelAttribute("regions")
     public Map<String, String> regions() {
@@ -66,7 +57,7 @@ public class ItemControllerV4 {
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
-        return "basic/v4/items";
+        return "/v4/items";
     }
 
     @GetMapping("/{itemId}")
@@ -74,13 +65,13 @@ public class ItemControllerV4 {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
 
-        return "basic/v4/item";
+        return "/v4/item";
     }
 
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("item", new Item());
-        return "basic/v4/addForm";
+        return "/v4/addForm";
     }
 
     @PostMapping("/add")
@@ -97,20 +88,20 @@ public class ItemControllerV4 {
         //검증의 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
             log.info("bindingResult = {}", bindingResult);
-            return "basic/v4/addForm";
+            return "/v4/addForm";
         }
 
         Item savedItem = itemRepository.save(new Item(form));
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/basic/v4/items/{itemId}";
+        return "redirect:/v4/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "basic/v4/editForm";
+        return "/v4/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
@@ -127,10 +118,10 @@ public class ItemControllerV4 {
         //검증의 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
             log.info("bindingResult = {}", bindingResult);
-            return "basic/v4/editForm";
+            return "/v4/editForm";
         }
 
         itemRepository.update(itemId, new Item(form));
-        return "redirect:/basic/v4/items/{itemId}";
+        return "redirect:/v4/items/{itemId}";
     }
 }

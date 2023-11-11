@@ -1,6 +1,6 @@
-package hello.itemservice.domain.web.basic;
+package hello.itemservice.web.item;
 
-import hello.itemservice.domain.web.basic.form.ItemSaveForm;
+import hello.itemservice.web.item.form.ItemSaveForm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/basic/api/items")
+@RequestMapping("/api/items")
 public class ItemApiController {
 
     /**
